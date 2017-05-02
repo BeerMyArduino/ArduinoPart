@@ -1,4 +1,5 @@
-
+#include "LiquidCrystal_I2C.h"
+#pragma once
 // nado posmotret, kakie nomera u etih pinov
 
 // ten (heating element)
@@ -10,24 +11,19 @@ const uint8_t pin_shaker = 8;
 // ds temperature pin
 const uint8_t ds_pin = 10;
 
-// running string
-char anton_pidor[17][17] = {
-  "anton PIDOR     ",
-  "nton PIDOR     a",
-  "ton PIDOR     an",
-  "on PIDOR     ant",
-  "n PIDOR     anto",
-  " PIDOR     anton",
-  "PIDOR     anton ",
-  "IDOR     anton P",
-  "DOR     anton PI",
-  "OR     anton PID",
-  "R     anton PIDO",
-  "     anton PIDOR",
-  "    anton PIDOR ",
-  "   anton PIDOR  ",
-  "  anton PIDOR   ",
-  " anton PIDOR    "
-};
-
+// lcd object
 LiquidCrystal_I2C lcd(0x3F, 16, 2);
+
+/*
+*  внутренние параметры системы
+*/
+
+// я думаю так: если температура различна
+// в более чем delta_temperature (в цельсиях),
+// то включаем насос на период времени shaker_period
+// взял из головы
+
+int delta_temperature = 10;
+
+unsigned long shaker_period = 18000;
+

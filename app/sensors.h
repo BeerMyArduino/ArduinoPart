@@ -9,13 +9,11 @@ OneWire  ds(ds_pin);
 
 void read_temp()
 {
-	current_sensor = 0;
-
 	char i;
 	char present = 0;
 	char type_s;
 	char data[12];
-	char addr[8];
+	uint8_t addr[8];
 	int current_sensor = 0;
 	float celsius, fahrenheit;
 

@@ -1,6 +1,6 @@
-#include "LiquidCrystal_I2C.h"
 #include "sensors.h"
 #include "constants.h"
+#include "parser.h"
 
 
 unsigned long start_time = -1;
@@ -9,13 +9,14 @@ int a = 0;
 void setup() {
 	Serial.begin(9600);
 	lcd.begin();
-	pinMode(6, OUTPUT);
-	pinMode(7, OUTPUT);
+	pinMode(pin_heating, OUTPUT);
+	pinMode(pin_shaker, OUTPUT);
+	state = BeerState::MANUAL;
 }
 
 void loop()
 {
-
+	parse();
 }
 
 
