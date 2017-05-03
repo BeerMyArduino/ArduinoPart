@@ -1,4 +1,5 @@
 #pragma once
+#include "constants.h"
 /*
 *	параметры проекта
 */
@@ -14,7 +15,7 @@ float temperature[2] = {0.0f, 0.0f};
 
 // булевские переменные работы тэна и насоса
 bool heating_el_works = false;
-bool shaker_Works = false;
+bool shaker_works = false;
 
 
 /*
@@ -29,6 +30,9 @@ int required_boil_temperature = 0;
 
 // текущее время
 unsigned long current_time = 0;
+
+// время начала варки
+unsigned long boil_start = 0;
 
 // время начала мешания
 unsigned long shake_start = 0;
@@ -57,14 +61,14 @@ void brute_control_heating_el(char command)
 	if (command == '+')
 	{
 		state = BeerState::MANUAL;
-		digitalWrite(pin_heatng, HIGH);
-		heatingElWorks = true;
+		digitalWrite(pin_heating, HIGH);
+		heating_el_works = true;
 	} 
 	else if (command == '-')
 	{
 		state = BeerState::MANUAL;
-		digitalWrite(pin_heatng, LOW);
-		heatingElWorks = false;
+		digitalWrite(pin_heating, LOW);
+		heating_el_works = false;
 	}
 }
 
@@ -74,13 +78,13 @@ void brute_control_shaker(char command)
 	{
 		state = BeerState::MANUAL;
 		digitalWrite(pin_shaker, HIGH);
-		shakerWorks = true;
+		shaker_works = true;
 	} 
 	else if (command == '-')
 	{
 		state = BeerState::MANUAL;
 		digitalWrite(pin_shaker, LOW);
-		shakerWorks = false;
+		shaker_works = false;
 	}
 }
 
@@ -88,13 +92,13 @@ void control_heating_el(char command)
 {
 	if (command == '+')
 	{
-		digitalWrite(pin_heatng, HIGH);
-		heatingElWorks = true;
+		digitalWrite(pin_heating, HIGH);
+		heating_el_works = true;
 	} 
 	else if (command == '-')
 	{
-		digitalWrite(pin_heatng, LOW);
-		heatingElWorks = false;
+		digitalWrite(pin_heating, LOW);
+		heating_el_works = false;
 	}
 }
 
@@ -103,18 +107,18 @@ void control_shaker(char command)
 	if (command == '+')
 	{
 		digitalWrite(pin_shaker, HIGH);
-		shakerWorks = true;
+		shaker_works = true;
 	} 
 	else if (command == '-')
 	{
 		digitalWrite(pin_shaker, LOW);
-		shakerWorks = false;
+		shaker_works = false;
 	}
 }
 
 void control_timer(char new_time)
 {
-	required_boil_time = ((unsigned long) new_time) * 60;
+	required_boil_time = ((unsigned long) new_time) * 60000;
 }
 
 
@@ -128,6 +132,12 @@ void check_time()
 	current_time = millis();
 }
 
+void start_boil()
+{
+  state = BeerState::BOIL;
+  
+}
+
 void control()
 {
 	check_time();
@@ -137,40 +147,56 @@ void control()
 	}
 	else if (state == BeerState::BOIL)
 	{
-		if (temperature[LOW] < required_boil_temperature
-			&& !heating_el_works)
-		{
-			control_heating_el('+');
-		}
-		else if (temperature[LOW] > required_boil_temperature
-				&& heating_el_works)
-		{
-			control_heating_el('-');
-		}
-
-		if (temperature[LOW] > temperature[HIGH] + delta_temperature)
-		{
-			state = BeerState::SHAKE;
-			shake_start = current_time;
-			control_shaker('+');
-		}
-	} else if (state == BeerState::SHAKE)
+    		if (temperature[LOW] < required_boil_temperature
+    			&& !heating_el_works)
+    		{
+    			control_heating_el('+');
+    		}
+    		else if (temperature[LOW] > required_boil_temperature
+    				&& heating_el_works)
+    		{
+    			control_heating_el('-');
+    		}
+    
+    		if (temperature[LOW] > temperature[HIGH] + delta_temperature)
+    		{
+    			state = BeerState::SHAKE;
+    			shake_start = current_time;
+    			control_shaker('+');
+    		}
+    
+        if (boil_start + required_boil_time > current_time)
+        {
+          state = BeerState::MANUAL;
+          control_heating_el('-');
+          control_shaker('-');
+        }
+   
+	} 
+	else if (state == BeerState::SHAKE)
 	{
-		if (temperature[LOW] < required_boil_temperature
-			&& !heating_el_works)
-		{
-			control_heating_el('+');
-		}
-		else if (temperature[LOW] > required_boil_temperature
-				&& heating_el_works)
-		{
-			control_heating_el('-');
-		}
-
-		if (temperature[LOW] <= temperature[HIGH] + delta_temperature)
-		{
-			state = BeerState::BOIL;
-			control_shaker('-');
-		}
+      		if (temperature[LOW] < required_boil_temperature
+      			&& !heating_el_works)
+      		{
+      			control_heating_el('+');
+      		}
+      		else if (temperature[LOW] > required_boil_temperature
+      				&& heating_el_works)
+      		{
+      			control_heating_el('-');
+      		}
+      
+      		if (temperature[LOW] <= temperature[HIGH] + delta_temperature)
+      		{
+      			state = BeerState::BOIL;
+      			control_shaker('-');
+      		}
+      
+          if (boil_start + required_boil_time > current_time)
+          {
+            state = BeerState::MANUAL;
+            control_heating_el('-');
+            control_shaker('-');
+          }
 	}
 }

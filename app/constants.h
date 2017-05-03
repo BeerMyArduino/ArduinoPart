@@ -3,10 +3,10 @@
 // nado posmotret, kakie nomera u etih pinov
 
 // ten (heating element)
-const uint8_t pin_heating = 7;
+const uint8_t pin_heating = 6;
 
 // meshalka (shaker)
-const uint8_t pin_shaker = 8;
+const uint8_t pin_shaker = 7;
 
 // ds temperature pin
 const uint8_t ds_pin = 10;

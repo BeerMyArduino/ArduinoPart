@@ -13,6 +13,7 @@ void parse()
 			case 'p': brute_control_shaker(Serial.read()); break;
 			case 'c': control_timer(Serial.read()); break;
 			case 't': control_temperature(Serial.read()); break;
+      case 's': start_boil();
 		}
 	}
 }

@@ -6,6 +6,8 @@
 unsigned long start_time = -1;
 int a = 0;
 
+int output = 0;
+
 void setup() {
 	Serial.begin(9600);
 	lcd.begin();
@@ -16,44 +18,103 @@ void setup() {
 
 void loop()
 {
-	parse();
+  
+  ff();
 }
 
 
 void ff() {
 	char s[16];
-	sprintf(s, "%ld", millis() / 1000);
-	lcd.setCursor(0, 0);
-	lcd.print(s);
+  read_temp();
+  
+//CLR SCR
+  lcd.setCursor(0,0);
+  lcd.print("                ");
+  lcd.setCursor(0,1);
+  lcd.print("                ");
+  
+  
+  if (temperature[LOW] < 0)
+  {
+    temperature[LOW] += 32;
+  }
+  if (temperature[HIGH] < 0)
+  {
+    temperature[HIGH] += 32;
+  }
+    
+  if (temperature[TOP] > 30)
+  {
+        digitalWrite(pin_heating, LOW);
+  }
+  else
+  {
+        digitalWrite(pin_heating, HIGH);
+  } 
+  
+  if (!output)
+  {
+    // TEMPERATURE
+      lcd.setCursor(0, 0);
+      lcd.print("TOP:    ");
+      Serial.print("TOP = ");
+      Serial.println(temperature[TOP]);
+      lcd.print(temperature[TOP]);
+    
+    
+      lcd.setCursor(0, 1);
+      lcd.print("BOTTOM: ");
+      Serial.print("BOTTOM = ");
+      Serial.println(temperature[BOTTOM]);
+      lcd.print(temperature[BOTTOM]);
 
-	lcd.setCursor(8, 1);
-	//lcd.print(celsius);
+  }
+  else
+  {
+      unsigned long TIME = millis();
+      unsigned long SECONDS = (TIME / 1000) % 60;
+      unsigned long MINUTES = (TIME / 60000) % 60;
+      unsigned long HOURS = (TIME / 3600000);
+      // TIME
+      sprintf(s, "%02ld:%02ld:%02ld", HOURS, MINUTES, SECONDS);
+      lcd.setCursor(0, 0);
+      lcd.print("Time  ");
+      lcd.print(s);
+     
+      //lcd.print(celsius);
+    
+      if (start_time != -1)
+      {
+          lcd.setCursor(0, 1);
+          lcd.print("Start ");
+          TIME = TIME - start_time;
+          SECONDS = (TIME / 1000) % 60;
+          MINUTES = (TIME / 60000) % 60;
+          HOURS = (TIME / 3600000);
+          sprintf(s, "%02ld:%02ld:%02ld", HOURS, MINUTES, SECONDS);
+          lcd.print(s);
+      }
+      
+      int val;
+      if (Serial.available())
+      {
+          val = Serial.read();
+          if (val == 's')
+          {
+              start_time = millis();
+          }
+          val = 0;
+      }
+  }
 
-	if (start_time != -1)
-	{
-		lcd.setCursor(0, 1);
 
-		sprintf(s, "%ld", (millis() - start_time) / 1000);
-		lcd.print(s);
-	}
+  
 
-	int val;
-	if (Serial.available())
-	{
-		val = Serial.read();
-		// При символе "1" включаем светодиод
-		if (val == 's')
-		{
-			start_time = millis();
-		}
-		// При символе "0" выключаем светодиод
-		if ( val == '0')
-		{
-			digitalWrite(13, LOW);
-		}
-		val = 0;
-	}
 
-	delay(5000);
+
+
+  
+  output = output ? 0 : 1;
+	delay(500);
 }
 	
