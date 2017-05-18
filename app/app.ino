@@ -1,6 +1,7 @@
 #include "sensors.h"
 #include "constants.h"
 #include "parser.h"
+#include "output.h"
 
 
 unsigned long start_time = -1;
@@ -18,16 +19,49 @@ void setup() {
 
 void loop()
 {
-  
-  ff();
+  wrk();
+}
+
+void wrk()
+{
+  LOG("");
+  LOG("");
+	parse_BT();
+  read_temp();
+  control();
+	output_BT();
+  output_lcd();
+  Serial.println(bt_str);
+  delay(1000);  
 }
 
 
-void ff() {
+void test_bt_lcd()
+{
+  lcd.setCursor(0,0);
+  lcd.print("                ");
+  lcd.setCursor(0,1);
+  lcd.print("                ");
+  lcd.setCursor(0,0);
+  
+  int i = 0;
+  if (!Serial.available())
+  {
+    lcd.print ("Nothing");
+  }
+  while(Serial.available())
+  {
+    char c = Serial.read();
+    lcd.print(c);
+  }
+  delay(2000);
+}
+
+
+void test_mode() 
+{
 	char s[16];
   read_temp();
-  
-//CLR SCR
   lcd.setCursor(0,0);
   lcd.print("                ");
   lcd.setCursor(0,1);
@@ -45,32 +79,32 @@ void ff() {
     
   if (temperature[TOP] > 30)
   {
-        digitalWrite(pin_heating, LOW);
+    digitalWrite(pin_heating, LOW);
   }
   else
   {
-        digitalWrite(pin_heating, HIGH);
+    digitalWrite(pin_heating, HIGH);
   } 
   
   if (!output)
   {
     // TEMPERATURE
-      lcd.setCursor(0, 0);
-      lcd.print("TOP:    ");
-      Serial.print("TOP = ");
-      Serial.println(temperature[TOP]);
-      lcd.print(temperature[TOP]);
-    
-    
-      lcd.setCursor(0, 1);
-      lcd.print("BOTTOM: ");
-      Serial.print("BOTTOM = ");
-      Serial.println(temperature[BOTTOM]);
-      lcd.print(temperature[BOTTOM]);
+    lcd.setCursor(0, 0);
+    lcd.print("TOP:    ");
+    Serial.print("TOP = ");
+    Serial.println(temperature[TOP]);
+    lcd.print(temperature[TOP]);
+  
+  
+    lcd.setCursor(0, 1);
+    lcd.print("BOTTOM: ");
+    Serial.print("BOTTOM = ");
+    Serial.println(temperature[BOTTOM]);
+    lcd.print(temperature[BOTTOM]);
 
-  }
-  else
-  {
+	  }
+	  else
+	  {
       unsigned long TIME = millis();
       unsigned long SECONDS = (TIME / 1000) % 60;
       unsigned long MINUTES = (TIME / 60000) % 60;
@@ -107,13 +141,6 @@ void ff() {
       }
   }
 
-
-  
-
-
-
-
-  
   output = output ? 0 : 1;
 	delay(500);
 }

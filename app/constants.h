@@ -27,3 +27,30 @@ int delta_temperature = 10;
 
 unsigned long shaker_period = 18000;
 
+
+
+// LOGGING
+// В РЕЛИЗЕ ЗАКОММЕНТИРУЙТЕ ВНУТРЕННОСТИ ФУНКЦИЙ
+// В ДЕБАГЕ НАСЛАЖДАЙТЕСЬ КУЧЕЙ ФЛУДА В СЕРИАЛ ПОРТЕ
+
+void LOG(const char* s)
+{
+//	Serial.print("DEBUG: ");
+//	Serial.println(s);
+}
+
+void LOG(const char *s1, const char *s2)
+{
+//	Serial.print("DEBUG: ");
+//	Serial.print(s1);
+//	Serial.println(s2);
+}
+
+void LOG(const char *param, unsigned long val)
+{
+//  Serial.print("DEBUG: ");
+//  Serial.print(param);
+//  Serial.print(" = ");
+//  Serial.println(val);
+}
+

@@ -61,8 +61,11 @@ void read_temp()
 			else if (cfg == 0x40) raw = raw & ~1; // 11 bit res, 375 ms
 		}
 		celsius = (float)raw / 16.0;
+    if (celsius < 0) 
+        celsius += 32.0f;
 		temperature[current_sensor] = celsius;
 		current_sensor++;
 	}
 	return;
+ 
 }
