@@ -1,2 +1,2 @@
 # ArduinoPart
-Arduino project for veer machine
+Arduino project for beer machine
